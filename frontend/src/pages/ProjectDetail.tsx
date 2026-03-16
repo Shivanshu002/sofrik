@@ -2,8 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
-import { fetchTasks, deleteTask } from '../store/tasksSlice';
-import { projectsApi } from '../api';
+import { fetchTasks, deleteTask } from '../store/actions/taskActions';
+import { doGet } from '../services';
+import { Routes } from '../utils/routes';
 import { Project, Task } from '../types';
 import Layout from '../components/Layout';
 import Modal from '../components/Modal';
@@ -26,14 +27,17 @@ const ProjectDetail: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const loadTasks = useCallback(() => {
-    if (id) dispatch(fetchTasks({ projectId: id, status: statusFilter }));
+    if (id) dispatch(fetchTasks(id, statusFilter));
   }, [dispatch, id, statusFilter]);
 
   useEffect(() => {
     if (id) {
-      projectsApi.getOne(id).then((res) => setProject(res.data)).catch(() => navigate('/dashboard'));
+      doGet(Routes.url.projects.byId(id))
+        .then((res) => setProject(res.data))
+        .catch(() => navigate('/dashboard'));
     }
   }, [id, navigate]);
 
@@ -53,20 +57,29 @@ const ProjectDetail: React.FC = () => {
   };
 
   return (
-    <Layout selectedProject={project} selectedTask={selectedTask}>
-      <div className="px-6 py-8">
-        <button onClick={() => navigate('/dashboard')} className="text-indigo-600 text-sm mb-4 hover:underline flex items-center gap-1">
-          ← Back to Dashboard
-        </button>
+    <Layout selectedProject={project} selectedTask={selectedTask} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}>
+      <div className="px-4 md:px-6 py-6 md:py-8">
+        {/* Mobile top bar */}
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden p-2 rounded-lg border border-gray-200 text-gray-600"
+          >
+            ☰
+          </button>
+          <button onClick={() => navigate('/dashboard')} className="text-indigo-600 text-sm hover:underline">
+            ← Dashboard
+          </button>
+        </div>
 
         {project && (
-          <div className="bg-white rounded-xl shadow p-6 mb-6 border border-gray-100">
-            <div className="flex justify-between items-start">
+          <div className="bg-white rounded-xl shadow p-5 mb-6 border border-gray-100">
+            <div className="flex justify-between items-start gap-3">
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">{project.title}</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800">{project.title}</h1>
                 <p className="text-gray-500 mt-1 text-sm">{project.description}</p>
               </div>
-              <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+              <span className={`text-xs px-3 py-1 rounded-full font-medium shrink-0 ${
                 project.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
               }`}>
                 {project.status}
@@ -76,12 +89,12 @@ const ProjectDetail: React.FC = () => {
         )}
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h2 className="text-lg font-semibold text-gray-700">Tasks</h2>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
               <option value="">All</option>
               <option value="todo">Todo</option>
@@ -90,7 +103,7 @@ const ProjectDetail: React.FC = () => {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-400">Click a task for AI suggestions →</p>
+            <p className="text-xs text-gray-400 hidden sm:block">Click task for AI →</p>
             <button
               onClick={() => { setEditTask(null); setShowModal(true); }}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm"
@@ -121,9 +134,9 @@ const ProjectDetail: React.FC = () => {
                     : 'border-transparent hover:border-indigo-200'
                 }`}
               >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-gray-800">{task.title}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="font-medium text-gray-800 text-sm md:text-base">{task.title}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusBadge(task.status)}`}>
                       {task.status}
                     </span>
@@ -131,23 +144,23 @@ const ProjectDetail: React.FC = () => {
                       <span className="text-xs text-indigo-500">🤖 AI active</span>
                     )}
                   </div>
-                  {task.description && <p className="text-sm text-gray-500">{task.description}</p>}
+                  {task.description && <p className="text-sm text-gray-500 truncate">{task.description}</p>}
                   {task.dueDate && (
                     <p className="text-xs text-gray-400 mt-1">
                       📅 Due: {new Date(task.dueDate).toLocaleDateString()}
                     </p>
                   )}
                 </div>
-                <div className="flex gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
+                <div className="flex gap-2 ml-3 shrink-0" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => { setEditTask(task); setShowModal(true); }}
-                    className="text-sm border border-gray-300 text-gray-600 px-3 py-1 rounded-lg hover:bg-gray-50"
+                    className="text-xs md:text-sm border border-gray-300 text-gray-600 px-2 md:px-3 py-1 rounded-lg hover:bg-gray-50"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(task._id)}
-                    className="text-sm border border-red-300 text-red-500 px-3 py-1 rounded-lg hover:bg-red-50"
+                    className="text-xs md:text-sm border border-red-300 text-red-500 px-2 md:px-3 py-1 rounded-lg hover:bg-red-50"
                   >
                     Delete
                   </button>

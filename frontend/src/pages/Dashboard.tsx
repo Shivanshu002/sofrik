@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState, AppDispatch } from '../store';
-import { fetchProjects, deleteProject } from '../store/projectsSlice';
+import { fetchProjects, deleteProject } from '../store/actions/projectActions';
 import Layout from '../components/Layout';
 import Modal from '../components/Modal';
 import ProjectForm from '../components/ProjectForm';
@@ -19,6 +19,7 @@ const Dashboard: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const load = useCallback(() => {
     dispatch(fetchProjects({ page: currentPage, limit: 9, search, status }));
@@ -50,13 +51,30 @@ const Dashboard: React.FC = () => {
       setStatus={(v) => { setStatus(v); setCurrentPage(1); }}
       onNewProject={() => { setEditProject(null); setShowModal(true); }}
       selectedProject={selectedProject}
+      sidebarOpen={sidebarOpen}
+      setSidebarOpen={setSidebarOpen}
     >
-      <div className="px-6 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">My Projects</h1>
-            <p className="text-sm text-gray-500 mt-1">Click a project to get AI suggestions →</p>
+      <div className="px-4 md:px-6 py-6 md:py-8">
+        {/* Mobile top bar */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 rounded-lg border border-gray-200 text-gray-600"
+            >
+              ☰
+            </button>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-gray-800">My Projects</h1>
+              <p className="text-xs text-gray-400 hidden sm:block">Click a project to get AI suggestions →</p>
+            </div>
           </div>
+          <button
+            onClick={() => { setEditProject(null); setShowModal(true); }}
+            className="bg-indigo-600 text-white px-3 py-2 md:px-4 rounded-lg hover:bg-indigo-700 text-sm font-medium"
+          >
+            + New
+          </button>
         </div>
 
         {loading ? (
@@ -69,7 +87,7 @@ const Dashboard: React.FC = () => {
           <div className="text-center py-20 text-gray-400">
             <div className="text-5xl mb-3">📂</div>
             <p className="font-medium">No projects found.</p>
-            <p className="text-sm mt-1">Create your first project from the sidebar!</p>
+            <p className="text-sm mt-1">Create your first project!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -83,8 +101,8 @@ const Dashboard: React.FC = () => {
                     : 'border-transparent hover:border-indigo-200 hover:shadow-md'
                 }`}
               >
-                <div className="flex justify-between items-start">
-                  <h2 className="font-semibold text-gray-800 flex-1 pr-2">{project.title}</h2>
+                <div className="flex justify-between items-start gap-2">
+                  <h2 className="font-semibold text-gray-800 flex-1 text-sm md:text-base">{project.title}</h2>
                   <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${statusBadge(project.status)}`}>
                     {project.status}
                   </span>
@@ -93,26 +111,24 @@ const Dashboard: React.FC = () => {
                   {project.description || 'No description'}
                 </p>
                 {selectedProject?._id === project._id && (
-                  <div className="text-xs text-indigo-500 font-medium flex items-center gap-1">
-                    <span>🤖</span> AI suggestions loading on right →
-                  </div>
+                  <p className="text-xs text-indigo-500 font-medium">🤖 AI suggestions loading →</p>
                 )}
                 <div className="flex gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => navigate(`/projects/${project._id}`)}
-                    className="flex-1 text-sm border border-indigo-600 text-indigo-600 py-1.5 rounded-lg hover:bg-indigo-50"
+                    className="flex-1 text-xs md:text-sm border border-indigo-600 text-indigo-600 py-1.5 rounded-lg hover:bg-indigo-50"
                   >
-                    View Tasks
+                    View
                   </button>
                   <button
                     onClick={() => { setEditProject(project); setShowModal(true); }}
-                    className="flex-1 text-sm border border-gray-300 text-gray-600 py-1.5 rounded-lg hover:bg-gray-50"
+                    className="flex-1 text-xs md:text-sm border border-gray-300 text-gray-600 py-1.5 rounded-lg hover:bg-gray-50"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(project._id)}
-                    className="flex-1 text-sm border border-red-300 text-red-500 py-1.5 rounded-lg hover:bg-red-50"
+                    className="flex-1 text-xs md:text-sm border border-red-300 text-red-500 py-1.5 rounded-lg hover:bg-red-50"
                   >
                     Delete
                   </button>
@@ -123,7 +139,7 @@ const Dashboard: React.FC = () => {
         )}
 
         {totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-2 mt-8 flex-wrap">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}

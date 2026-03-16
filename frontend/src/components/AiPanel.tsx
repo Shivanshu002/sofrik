@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { aiApi } from '../api';
+import { getSuggestions, sendChatMessage as sendChatApi } from '../store/actions/aiActions';
 import { Project, Task } from '../types';
 
 interface Props {
@@ -92,15 +92,15 @@ const AiPanel: React.FC<Props> = ({ selectedProject, selectedTask }) => {
     setActiveTab('suggestions');
 
     try {
-      const res = await aiApi.suggest({
+      const res = await getSuggestions({
         title: item.title,
         description: item.description,
         type,
         status: item.status,
         dueDate: type === 'task' ? (item as Task).dueDate : undefined,
       });
-      if (res.data.suggestions?.length > 0) {
-        setSuggestions(res.data.suggestions);
+      if (res.suggestions?.length > 0) {
+        setSuggestions(res.suggestions);
       } else {
         setError('No suggestions returned. Try refreshing.');
       }
@@ -147,8 +147,8 @@ const AiPanel: React.FC<Props> = ({ selectedProject, selectedTask }) => {
         : selectedProject
         ? `Working on project: "${selectedProject.title}" (${selectedProject.status})`
         : undefined;
-      const res = await aiApi.chat({ message, context });
-      setChatMessages((prev) => [...prev, { role: 'ai', text: res.data.reply }]);
+      const res = await sendChatApi({ message, context });
+      setChatMessages((prev) => [...prev, { role: 'ai', text: res.reply }]);
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || 'Something went wrong.';
       setChatMessages((prev) => [...prev, { role: 'ai', text: `⚠️ ${msg}` }]);

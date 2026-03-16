@@ -10,9 +10,10 @@ interface Props {
   status: string;
   setStatus: (v: string) => void;
   onNewProject: () => void;
+  onClose?: () => void;
 }
 
-const Sidebar: React.FC<Props> = ({ search, setSearch, status, setStatus, onNewProject }) => {
+const Sidebar: React.FC<Props> = ({ search, setSearch, status, setStatus, onNewProject, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,11 +34,13 @@ const Sidebar: React.FC<Props> = ({ search, setSearch, status, setStatus, onNewP
     <aside className="w-64 shrink-0 flex flex-col bg-white border-r border-gray-200 min-h-screen">
       {/* Logo */}
       <div
-        className="px-5 py-4 border-b cursor-pointer flex items-center gap-2"
-        onClick={() => navigate('/dashboard')}
+        className="px-5 py-4 border-b cursor-pointer flex items-center justify-between"
       >
-        <span className="text-2xl">📋</span>
-        <span className="font-bold text-indigo-600 text-lg">ProjectMgr</span>
+        <div className="flex items-center gap-2" onClick={() => { navigate('/dashboard'); onClose?.(); }}>
+          <span className="text-2xl">📋</span>
+          <span className="font-bold text-indigo-600 text-lg">ProjectMgr</span>
+        </div>
+        <button onClick={onClose} className="md:hidden text-gray-400 hover:text-gray-600 text-xl">✕</button>
       </div>
 
       {/* Profile */}

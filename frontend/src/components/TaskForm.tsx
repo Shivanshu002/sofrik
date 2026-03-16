@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { tasksApi } from '../api';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store';
+import { createTask, updateTask } from '../store/actions/taskActions';
 import { Task } from '../types';
 
 const schema = yup.object({
@@ -22,6 +24,7 @@ interface Props {
 }
 
 const TaskForm: React.FC<Props> = ({ task, projectId, onSuccess, onCancel }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState('');
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema) as any,
@@ -35,9 +38,8 @@ const TaskForm: React.FC<Props> = ({ task, projectId, onSuccess, onCancel }) => 
 
   const onSubmit = async (data: FormData) => {
     try {
-      if (task) await tasksApi.update(task._id, data as any);
-      else await tasksApi.create({ ...data, project: projectId });
-      onSuccess();
+      if (task) await dispatch(updateTask(task._id, data as any, onSuccess));
+      else await dispatch(createTask({ ...data, project: projectId }, onSuccess));
     } catch {
       setError('Something went wrong. Please try again.');
     }
