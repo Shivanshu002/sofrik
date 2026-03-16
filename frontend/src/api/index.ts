@@ -28,3 +28,10 @@ export const tasksApi = {
     api.put<Task>(`/tasks/${id}`, data),
   delete: (id: string) => api.delete(`/tasks/${id}`),
 };
+
+export const aiApi = {
+  suggest: (data: { title: string; description?: string; type: 'project' | 'task'; status?: string; dueDate?: string }) =>
+    api.post<{ suggestions: string[] }>('/ai/suggest', data),
+  chat: (data: { message: string; context?: string }) =>
+    api.post<{ reply: string }>('/ai/chat', data),
+};
