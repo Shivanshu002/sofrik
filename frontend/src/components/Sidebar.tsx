@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RootState, AppDispatch } from '../store';
-import { logout } from '../store/authSlice';
+import { logout } from '../store/slices/authSlice';
 
 interface Props {
   search: string;
