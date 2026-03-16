@@ -55,7 +55,6 @@ const Dashboard: React.FC = () => {
       setSidebarOpen={setSidebarOpen}
     >
       <div className="px-4 md:px-6 py-6 md:py-8">
-        {/* Mobile top bar */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <button
@@ -95,11 +94,10 @@ const Dashboard: React.FC = () => {
               <div
                 key={project._id}
                 onClick={() => setSelectedProject(project)}
-                className={`bg-white rounded-xl shadow p-5 flex flex-col gap-3 cursor-pointer transition-all border-2 ${
-                  selectedProject?._id === project._id
+                className={`bg-white rounded-xl shadow p-5 flex flex-col gap-3 cursor-pointer transition-all border-2 ${selectedProject?._id === project._id
                     ? 'border-indigo-500 shadow-lg'
                     : 'border-transparent hover:border-indigo-200 hover:shadow-md'
-                }`}
+                  }`}
               >
                 <div className="flex justify-between items-start gap-2">
                   <h2 className="font-semibold text-gray-800 flex-1 text-sm md:text-base">{project.title}</h2>
@@ -144,9 +142,8 @@ const Dashboard: React.FC = () => {
               <button
                 key={p}
                 onClick={() => setCurrentPage(p)}
-                className={`px-3 py-1 rounded-lg text-sm border ${
-                  p === page ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'
-                }`}
+                className={`px-3 py-1 rounded-lg text-sm border ${p === page ? 'bg-indigo-600 text-white border-indigo-600' : 'hover:bg-gray-50'
+                  }`}
               >
                 {p}
               </button>
