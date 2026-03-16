@@ -1,73 +1,126 @@
-# Project Management Tool
+# 📋 ProjectMgr — Full Stack Project Management Tool
 
-Full-stack project management app built with NestJS, React (TypeScript), MongoDB, Redux Toolkit, and Tailwind CSS.
+A full-stack project management application with AI-powered suggestions built with **NestJS**, **React (TypeScript)**, **MongoDB**, **Redux Toolkit**, and **Tailwind CSS**.
 
-## Stack
+---
 
-- **Backend**: NestJS, MongoDB (Mongoose), JWT Auth, bcryptjs
-- **Frontend**: React + TypeScript, Redux Toolkit, React Hook Form + Yup, Tailwind CSS
+## 🏗️ Architecture Overview
 
-## Setup
+```
+sofrik/
+├── backend/                  # NestJS REST API
+│   ├── src/
+│   │   ├── auth/             # JWT Authentication
+│   │   ├── projects/         # Projects CRUD
+│   │   ├── tasks/            # Tasks CRUD
+│   │   ├── ai/               # Gemini AI integration
+│   │   ├── schemas/          # Mongoose schemas
+│   │   └── seed/             # Database seeder
+│   └── .env                  # Environment variables
+│
+├── frontend/                 # React + TypeScript SPA
+│   └── src/
+│       ├── services/         # HTTP client (doGet/doPost/doPut/doDelete)
+│       ├── utils/            # Centralized API route constants
+│       ├── store/
+│       │   ├── slices/       # Redux state slices
+│       │   └── actions/      # Async thunks (API calls)
+│       ├── components/       # Reusable UI components
+│       ├── pages/            # Route-level page components
+│       └── types/            # TypeScript interfaces
+│
+└── README.md                 # This file
+```
 
-### Backend
+---
 
+## 🔄 Data Flow
+
+```
+User Action
+    ↓
+Page Component (Dashboard / ProjectDetail)
+    ↓
+Redux Action (store/actions/*.ts)
+    ↓
+Service Layer (services/index.ts → doPost/doGet)
+    ↓
+API Route (utils/routes.ts)
+    ↓
+NestJS Backend (Controller → Service → MongoDB)
+    ↓
+Redux Slice (store/slices/*.ts) updates state
+    ↓
+UI re-renders
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js v18+
+- MongoDB Atlas account (or local MongoDB)
+
+### 1. Clone & Setup Backend
 ```bash
 cd backend
 npm install
+# Add your credentials to .env (see backend/README.md)
 npm run start:dev
 ```
+Backend runs on → `http://localhost:3001`
 
-Runs on `http://localhost:3001`
-
-### Frontend
-
+### 2. Setup Frontend
 ```bash
 cd frontend
 npm install
 npm start
 ```
+Frontend runs on → `http://localhost:3000`
 
-Runs on `http://localhost:3000`
-
-## Seed Database
-
+### 3. Seed Database
 ```bash
 cd backend
 npm run seed
 ```
+Creates: `test@example.com` / `Test@123` with 2 projects and 6 tasks.
 
-This creates:
-- 1 user: `test@example.com` / `Test@123`
-- 2 projects linked to that user
-- 3 tasks per project (6 total)
+---
 
-## API Endpoints
+## 🌿 Git Branch Strategy
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /api/auth/register | Register |
-| POST | /api/auth/login | Login |
-| GET | /api/projects | List projects (pagination + search) |
-| POST | /api/projects | Create project |
-| GET | /api/projects/:id | Get project |
-| PUT | /api/projects/:id | Update project |
-| DELETE | /api/projects/:id | Delete project |
-| GET | /api/tasks/project/:id | Get tasks by project |
-| POST | /api/tasks | Create task |
-| PUT | /api/tasks/:id | Update task |
-| DELETE | /api/tasks/:id | Delete task |
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production-ready code |
+| `dev` | Integration branch, cut from main |
+| `feature/implement-ai-lib` | AI feature development, cut from dev |
 
-## Features
+---
 
-- JWT-based authentication (register/login)
-- Password hashing with bcrypt
+## ✨ Features
+
+- JWT-based authentication (register / login)
 - Project CRUD with pagination & search
 - Task CRUD with status filter
+- AI suggestions on project/task click (Gemini)
+- AI chat assistant with formatted responses
+- Click suggestion → auto-sends as chat question
+- Responsive UI (mobile sidebar + floating AI panel)
 - Redux Toolkit state management
 - Form validation with React Hook Form + Yup
-- Responsive UI with Tailwind CSS
 
-## Known Limitations
+---
 
-- No email verification
-- No role-based access control
+## 🔑 Environment Variables
+
+### Backend `.env`
+```
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=7d
+PORT=3001
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+> Get a free Gemini API key at: https://aistudio.google.com/app/apikey
