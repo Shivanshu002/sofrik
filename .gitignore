@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+*.log
+coverage/
+docx_extracted/
+Assignment_copy.zip
