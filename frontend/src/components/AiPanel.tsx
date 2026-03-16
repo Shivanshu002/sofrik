@@ -63,7 +63,14 @@ const AiPanel: React.FC<Props> = ({ selectedProject, selectedTask }) => {
         setError('No suggestions returned. Try refreshing.');
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to get AI suggestions. Check your API key.');
+      const msg = err?.response?.data?.message || err?.message || 'Failed to get AI suggestions.';
+      if (msg.includes('429') || msg.includes('quota') || msg.includes('Too Many')) {
+        setError('⚠️ Gemini API quota exceeded. Get a new free key at aistudio.google.com/app/apikey');
+      } else if (msg.includes('404') || msg.includes('not found')) {
+        setError('⚠️ AI model not found. Please check backend configuration.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoadingSuggestions(false);
     }
@@ -92,8 +99,9 @@ const AiPanel: React.FC<Props> = ({ selectedProject, selectedTask }) => {
         : undefined;
       const res = await aiApi.chat({ message: userMsg, context });
       setChatMessages((prev) => [...prev, { role: 'ai', text: res.data.reply }]);
-    } catch {
-      setChatMessages((prev) => [...prev, { role: 'ai', text: 'Something went wrong. Please try again.' }]);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || 'Something went wrong.';
+      setChatMessages((prev) => [...prev, { role: 'ai', text: `⚠️ ${msg}` }]);
     } finally {
       setChatLoading(false);
     }
