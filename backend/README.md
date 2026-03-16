@@ -4,6 +4,27 @@ Built with **NestJS**, **MongoDB (Mongoose)**, **JWT Auth**, **bcryptjs**, and *
 
 ---
 
+## 🚀 Live Deployment
+
+| | |
+|---|---|
+| **Base URL** | `https://sofrik.onrender.com/api` |
+| **Platform** | [Render](https://render.com) |
+| **Auto Deploy** | ✅ Every push to `main` branch triggers auto-deploy via GitHub |
+
+> ⚠️ Render free tier spins down after inactivity. First request may take ~30s to wake up.
+
+### Live API Examples
+```
+do not have public access 
+
+POST https://sofrik.onrender.com/api/auth/login
+GET  https://sofrik.onrender.com/api/projects
+POST https://sofrik.onrender.com/api/ai/suggest
+```
+
+---
+
 ## 📁 Folder Structure
 
 ```
@@ -50,13 +71,20 @@ backend/src/
 
 ## ⚙️ Setup
 
+### Local Development
 ```bash
 npm install
-npm run start:dev     # Development with hot reload
+npm run start:dev     # Development with hot reload → http://localhost:3001
 npm run build         # Production build
 npm run start:prod    # Run production build
 npm run seed          # Seed database with dummy data
 ```
+
+### Render Deployment
+- **Build Command:** `npm install && npm run build`
+- **Start Command:** `npm run start:prod`
+- **Auto Deploy:** Enabled — pushes to `main` branch on GitHub trigger redeploy automatically
+- **Environment Variables:** Set in Render dashboard (see below)
 
 ---
 
@@ -75,6 +103,9 @@ GEMINI_API_KEY=your_gemini_api_key
 ---
 
 ## 📡 API Endpoints
+
+- **Local:** `http://localhost:3001/api`
+- **Production:** `https://sofrik.onrender.com/api`
 
 All routes are prefixed with `/api`
 
