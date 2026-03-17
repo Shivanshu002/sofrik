@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://localhost:3001/api/';
+export const BASE_URL = 'https://sofrik.onrender.com/api/';
 const TIMEOUT_MS = 50000;
 
 const instance = axios.create({
