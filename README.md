@@ -4,6 +4,8 @@ A full-stack project management application with AI-powered suggestions built wi
 
 ---
 
+Live Project Link `https://darling-crisp-9dbb06.netlify.app/dashboard`
+
 ## 🏗️ Architecture Overview
 
 ```
